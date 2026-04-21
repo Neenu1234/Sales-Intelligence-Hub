@@ -93,6 +93,17 @@ st.markdown("""
     .stSlider > div > label {
         color: #f0f6fc !important;
     }
+    .main .block-container {
+        padding-bottom: 1rem !important;
+    }
+    [data-testid="stBottom"] {
+        padding-bottom: 0 !important;
+        background: #080c14 !important;
+    }
+    [data-testid="stBottom"] > div {
+        padding-bottom: 0 !important;
+    }
+    footer { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
