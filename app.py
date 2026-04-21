@@ -452,9 +452,8 @@ with col_tree:
             colors=cat_stats["ReturnRate"],
             colorscale=[[0,"#10b981"],[0.5,"#f59e0b"],[1,"#ef4444"]],
             colorbar=dict(
-                title="Return %",
+                title=dict(text="Return %", font=dict(color="#f0f6fc")),
                 tickfont=dict(color="#f0f6fc"),
-                titlefont=dict(color="#f0f6fc"),
                 x=1.02,
             ),
         ),
@@ -482,9 +481,8 @@ with col_map:
         marker_line_color="#1f2937",
         marker_line_width=0.5,
         colorbar=dict(
-            title="Revenue ($)",
+            title=dict(text="Revenue ($)", font=dict(color="#f0f6fc")),
             tickfont=dict(color="#f0f6fc"),
-            titlefont=dict(color="#f0f6fc"),
         ),
         hovertemplate=(
             "<b>%{customdata[0]}</b><br>"
@@ -595,9 +593,8 @@ with col_ret:
         text=[[f"{v:.0f}%" for v in row] for row in ret_pivot.values],
         texttemplate="%{text}", textfont=dict(size=10, color="white"),
         colorbar=dict(
-            title="Return %",
+            title=dict(text="Return %", font=dict(color="#f0f6fc")),
             tickfont=dict(color="#f0f6fc"),
-            titlefont=dict(color="#f0f6fc"),
         ),
     ))
     fig_ret.update_layout(
@@ -813,7 +810,7 @@ with col_dow:
         text=[[f"${v/1e3:.0f}K" for v in row] for row in dow_pivot.values],
         texttemplate="%{text}",
         textfont=dict(size=10),
-        colorbar=dict(tickfont=dict(color="#f0f6fc"), titlefont=dict(color="#f0f6fc")),
+        colorbar=dict(tickfont=dict(color="#f0f6fc")),
     ))
     fig_dow.update_layout(
         **LAYOUT_BASE, height=400,
