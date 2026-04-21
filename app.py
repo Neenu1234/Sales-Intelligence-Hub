@@ -947,9 +947,13 @@ st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 # ══════════════════════════════════════════════════════════════════════════════
 # AI CHATBOT
 # ══════════════════════════════════════════════════════════════════════════════
-st.markdown("<p class='section-title'>AI Data Assistant</p>", unsafe_allow_html=True)
-st.subheader("Ask Anything About Your Sales Data")
-st.caption("Powered by Claude · Answers are based on the filtered dataset above")
+st.markdown("""
+<div style='margin-bottom:8px;'>
+  <p class='section-title' style='margin-bottom:2px;'>AI Data Assistant</p>
+  <span style='font-size:16px;font-weight:700;color:#f0f6fc;'>Ask Anything About Your Sales Data</span>
+  <span style='font-size:12px;color:#9ca3af;margin-left:10px;'>Powered by Claude · Based on filtered dataset</span>
+</div>
+""", unsafe_allow_html=True)
 
 # Build data context for Claude
 @st.cache_data
@@ -1037,7 +1041,7 @@ suggestions = [
     "Which warehouse ships the most orders?",
 ]
 
-st.markdown("<p style='color:#f0f6fc;font-size:13px;font-weight:600;'>Try asking:</p>", unsafe_allow_html=True)
+st.markdown("<p style='color:#f0f6fc;font-size:12px;font-weight:600;margin:4px 0 4px 0;'>Try asking:</p>", unsafe_allow_html=True)
 cols = st.columns(3)
 for i, col in enumerate(cols):
     with col:
