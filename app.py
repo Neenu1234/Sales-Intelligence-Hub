@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
+from datetime import date
 
 # ── Page config ────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -101,7 +102,7 @@ st.markdown("""
 @st.cache_data
 def load_data():
     df = pd.read_csv(
-        "/Users/neenubonny/Downloads/online_sales_dataset.csv",
+        "data/online_sales_dataset.csv",
         parse_dates=["InvoiceDate"],
     )
     # Clean & engineer
@@ -176,6 +177,10 @@ fdf = df[
     df["SalesChannel"].isin(channels) &
     df["Year"].between(year_range[0], year_range[1])
 ].copy()
+
+if fdf.empty:
+    st.warning("No data matches the selected filters. Please adjust the sidebar filters.")
+    st.stop()
 
 # ══════════════════════════════════════════════════════════════════════════════
 # HEADER
@@ -730,7 +735,7 @@ fig_wf.update_layout(
 )
 st.plotly_chart(fig_wf, use_container_width=True)
 
-wf_margin = (net_profit / gross_rev * 100)
+wf_margin = (net_profit / gross_rev * 100) if gross_rev else 0
 col_wf1, col_wf2, col_wf3 = st.columns(3)
 col_wf1.metric("Gross Revenue",   f"${gross_rev/1e6:.1f}M")
 col_wf2.metric("Total Discounts", f"${discount_loss/1e6:.1f}M", f"-{discount_loss/gross_rev*100:.1f}%", delta_color="inverse")
@@ -1006,7 +1011,6 @@ data_context = build_context(len(df))
 
 # ── Daily rate limit ──────────────────────────────────────────────────────
 DAILY_LIMIT = 10
-from datetime import date
 
 if "messages" not in st.session_state:
     st.session_state.messages = []
