@@ -118,6 +118,7 @@ def load_data():
     )
     # Clean & engineer
     df = df[df["UnitPrice"] > 0]
+    df = df[df["Quantity"] > 0]
     df["PaymentMethod"] = df["PaymentMethod"].replace("paypall", "PayPal")
     df["Revenue"]    = (df["Quantity"] * df["UnitPrice"] * (1 - df["Discount"])).round(2)
     df["Profit"]     = (df["Revenue"] - df["ShippingCost"].fillna(0)).round(2)
@@ -746,7 +747,7 @@ st.plotly_chart(fig_wf, use_container_width=True)
 wf_margin = (net_profit / gross_rev * 100) if gross_rev else 0
 col_wf1, col_wf2, col_wf3 = st.columns(3)
 col_wf1.metric("Gross Revenue",   f"${gross_rev/1e6:.1f}M")
-col_wf2.metric("Total Discounts", f"${discount_loss/1e6:.1f}M", f"-{discount_loss/gross_rev*100:.1f}%", delta_color="inverse")
+col_wf2.metric("Total Discounts", f"${discount_loss/1e6:.1f}M", f"-{discount_loss/gross_rev*100:.1f}%", delta_color="normal")
 col_wf3.metric("Net Margin",      f"{wf_margin:.1f}%")
 
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
@@ -892,13 +893,13 @@ for cat in fdf["Category"].unique():
 
 fig_bubble.add_hline(
     y=repeat["Orders"].median(), line_dash="dash",
-    line_color="#374151", line_width=1,
+    line_color="#f0f6fc", line_width=1.5,
     annotation_text="Median orders",
     annotation_font=dict(color="#f0f6fc", size=10),
 )
 fig_bubble.add_vline(
     x=repeat["AvgRev"].median(), line_dash="dash",
-    line_color="#374151", line_width=1,
+    line_color="#f0f6fc", line_width=1.5,
     annotation_text="Median avg order",
     annotation_font=dict(color="#f0f6fc", size=10),
 )
