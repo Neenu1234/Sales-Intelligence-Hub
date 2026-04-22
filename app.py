@@ -254,117 +254,6 @@ for col, (label, value) in zip(kpi_cols, kpi_data):
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
-# STORYTELLING SECTION
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown("<p class='section-title'>Business Story</p>", unsafe_allow_html=True)
-
-# ── Compute story metrics ──────────────────────────────────────────────────
-monthly_rev   = fdf.groupby("Month")["Revenue"].sum().sort_index()
-last_month    = monthly_rev.iloc[-1]  if len(monthly_rev) >= 1 else 0
-prev_month    = monthly_rev.iloc[-2]  if len(monthly_rev) >= 2 else last_month
-mom_change    = ((last_month - prev_month) / prev_month * 100) if prev_month else 0
-
-top_country   = fdf.groupby("Country")["Revenue"].sum().idxmax()
-top_country_rev = fdf.groupby("Country")["Revenue"].sum().max()
-
-worst_ret_cat = fdf.groupby("Category")["IsReturned"].mean().idxmax()
-worst_ret_pct = fdf.groupby("Category")["IsReturned"].mean().max() * 100
-
-best_cat      = fdf.groupby("Category")["Revenue"].sum().idxmax()
-best_cat_rev  = fdf.groupby("Category")["Revenue"].sum().max()
-
-# Month-over-month biggest mover by category
-cat_monthly   = fdf.groupby(["Month","Category"])["Revenue"].sum().unstack().fillna(0)
-if len(cat_monthly) >= 2:
-    last_cat   = cat_monthly.iloc[-1]
-    prev_cat   = cat_monthly.iloc[-2]
-    cat_change = ((last_cat - prev_cat) / prev_cat.replace(0,1) * 100)
-    biggest_gainer   = cat_change.idxmax()
-    biggest_gainer_pct = cat_change.max()
-    biggest_decliner = cat_change.idxmin()
-    biggest_decliner_pct = cat_change.min()
-else:
-    biggest_gainer = biggest_decliner = "N/A"
-    biggest_gainer_pct = biggest_decliner_pct = 0
-
-mom_arrow  = "▲" if mom_change >= 0 else "▼"
-mom_color  = "#10b981" if mom_change >= 0 else "#ef4444"
-gain_color = "#10b981"
-drop_color = "#ef4444"
-
-# ── Insight Cards ──────────────────────────────────────────────────────────
-st.markdown("#### Insight Cards")
-ic1, ic2, ic3 = st.columns(3)
-
-with ic1:
-    st.markdown(f"""
-    <div style='background:#0d1117;border:1px solid #1f2937;border-radius:12px;padding:16px;'>
-        <div style='font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>Revenue Trend</div>
-        <div style='font-size:22px;font-weight:700;color:{mom_color};margin:8px 0;'>{mom_arrow} {abs(mom_change):.1f}%</div>
-        <div style='font-size:13px;color:#f0f6fc;'>vs previous month</div>
-        <div style='font-size:12px;color:#f0f6fc;margin-top:6px;'>Latest month: <b>${last_month:,.0f}</b></div>
-    </div>""", unsafe_allow_html=True)
-
-with ic2:
-    st.markdown(f"""
-    <div style='background:#0d1117;border:1px solid #1f2937;border-radius:12px;padding:16px;'>
-        <div style='font-size:11px;color:#3b82f6;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>Top Market</div>
-        <div style='font-size:22px;font-weight:700;color:#f0f6fc;margin:8px 0;'>{top_country}</div>
-        <div style='font-size:13px;color:#f0f6fc;'>Highest revenue country</div>
-        <div style='font-size:12px;color:#f0f6fc;margin-top:6px;'>Revenue: <b>${top_country_rev:,.0f}</b></div>
-    </div>""", unsafe_allow_html=True)
-
-with ic3:
-    st.markdown(f"""
-    <div style='background:#0d1117;border:1px solid #1f2937;border-radius:12px;padding:16px;'>
-        <div style='font-size:11px;color:#ef4444;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>Return Risk</div>
-        <div style='font-size:22px;font-weight:700;color:#ef4444;margin:8px 0;'>{worst_ret_pct:.1f}%</div>
-        <div style='font-size:13px;color:#f0f6fc;'>{worst_ret_cat} has highest returns</div>
-        <div style='font-size:12px;color:#f0f6fc;margin-top:6px;'>Needs immediate attention</div>
-    </div>""", unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# ── What Changed ──────────────────────────────────────────────────────────
-st.markdown("#### What Changed This Month?")
-wc1, wc2 = st.columns(2)
-
-with wc1:
-    st.markdown(f"""
-    <div style='background:#0d1117;border:1px solid #10b981;border-radius:12px;padding:16px;'>
-        <div style='font-size:11px;color:#10b981;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>Biggest Gainer</div>
-        <div style='font-size:22px;font-weight:700;color:#10b981;margin:8px 0;'>▲ {biggest_gainer_pct:.1f}%</div>
-        <div style='font-size:14px;color:#f0f6fc;'><b>{biggest_gainer}</b> grew the most vs last month</div>
-    </div>""", unsafe_allow_html=True)
-
-with wc2:
-    st.markdown(f"""
-    <div style='background:#0d1117;border:1px solid #ef4444;border-radius:12px;padding:16px;'>
-        <div style='font-size:11px;color:#ef4444;font-weight:700;letter-spacing:2px;text-transform:uppercase;'>Biggest Decliner</div>
-        <div style='font-size:22px;font-weight:700;color:#ef4444;margin:8px 0;'>▼ {abs(biggest_decliner_pct):.1f}%</div>
-        <div style='font-size:14px;color:#f0f6fc;'><b>{biggest_decliner}</b> dropped the most vs last month</div>
-    </div>""", unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-
-# ── Executive Summary ──────────────────────────────────────────────────────
-st.markdown("#### Executive Summary")
-direction = "grew" if mom_change >= 0 else "declined"
-summary = (
-    f"For the selected period, <b>{top_country}</b> leads all markets with <b>${top_country_rev:,.0f}</b> in revenue. "
-    f"<b>{best_cat}</b> is the top-performing category at <b>${best_cat_rev:,.0f}</b>. "
-    f"Revenue {direction} <b>{abs(mom_change):.1f}%</b> compared to the previous month. "
-    f"A key risk area is <b>{worst_ret_cat}</b>, which carries the highest return rate at <b>{worst_ret_pct:.1f}%</b> — "
-    f"this warrants investigation into product quality or customer expectations. "
-    f"On category momentum, <b>{biggest_gainer}</b> is the fastest growing segment while <b>{biggest_decliner}</b> saw the steepest decline."
-)
-st.markdown(f"""
-<div style='background:#0d1117;border:1px solid #1f2937;border-left:4px solid #3b82f6;
-            border-radius:12px;padding:20px;font-size:14px;color:#f0f6fc;line-height:1.8;'>
-    {summary}
-</div>""", unsafe_allow_html=True)
-
-st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # ROW 1: Revenue Timeline + Sales Channel Split
@@ -639,70 +528,6 @@ with col_pri:
 
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
-# ══════════════════════════════════════════════════════════════════════════════
-# UNIQUE CHART 1 — SANKEY: Full Sales Journey
-# ══════════════════════════════════════════════════════════════════════════════
-st.markdown("<p class='section-title'>Sales Journey Flow</p>", unsafe_allow_html=True)
-st.subheader("Where Every Order Flows — Country → Category → Channel → Outcome")
-st.caption("Follow revenue as it flows from origin country through category and channel to final outcome")
-
-# Build Sankey nodes & links
-top_countries = fdf.groupby("Country")["Revenue"].sum().nlargest(6).index.tolist()
-san_df = fdf[fdf["Country"].isin(top_countries)].copy()
-
-categories_list = sorted(san_df["Category"].unique().tolist())
-channels_list   = san_df["SalesChannel"].unique().tolist()
-outcomes_list   = san_df["ReturnStatus"].unique().tolist()
-
-all_nodes   = top_countries + categories_list + channels_list + outcomes_list
-node_idx    = {n: i for i, n in enumerate(all_nodes)}
-node_colors = (
-    ["#3b82f6"] * len(top_countries) +
-    ["#10b981"] * len(categories_list) +
-    ["#f59e0b"] * len(channels_list) +
-    ["#ef4444", "#22c55e"]
-)
-
-src, tgt, val, lnk_colors = [], [], [], []
-
-# Layer 1: Country → Category
-for (country, cat), g in san_df.groupby(["Country", "Category"]):
-    if country in node_idx and cat in node_idx:
-        src.append(node_idx[country]); tgt.append(node_idx[cat])
-        val.append(g["Revenue"].sum())
-        lnk_colors.append("rgba(59,130,246,0.25)")
-
-# Layer 2: Category → Channel
-for (cat, ch), g in san_df.groupby(["Category", "SalesChannel"]):
-    src.append(node_idx[cat]); tgt.append(node_idx[ch])
-    val.append(g["Revenue"].sum())
-    lnk_colors.append("rgba(16,185,129,0.25)")
-
-# Layer 3: Channel → Return Status
-for (ch, outcome), g in san_df.groupby(["SalesChannel", "ReturnStatus"]):
-    src.append(node_idx[ch]); tgt.append(node_idx[outcome])
-    val.append(g["Revenue"].sum())
-    color = "rgba(239,68,68,0.3)" if outcome == "Returned" else "rgba(34,197,94,0.3)"
-    lnk_colors.append(color)
-
-fig_sankey = go.Figure(go.Sankey(
-    arrangement="snap",
-    node=dict(
-        pad=18, thickness=20,
-        label=all_nodes,
-        color=node_colors[:len(all_nodes)],
-        hovertemplate="%{label}<br>Revenue: $%{value:,.0f}<extra></extra>",
-    ),
-    link=dict(
-        source=src, target=tgt, value=val,
-        color=lnk_colors,
-        hovertemplate="$%{value:,.0f}<extra></extra>",
-    ),
-))
-fig_sankey.update_layout(**LAYOUT_BASE, height=500)
-st.plotly_chart(fig_sankey, use_container_width=True)
-
-st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # UNIQUE CHART 2 — WATERFALL: Revenue Breakdown
@@ -926,6 +751,20 @@ CAT_NUMS = {c: i for i, c in enumerate(sorted(fdf["Category"].unique()))}
 sample   = fdf.sample(min(3000, len(fdf)), random_state=42).copy()
 sample["CatNum"] = sample["Category"].map(CAT_NUMS)
 
+# Pre-compute clip bounds
+_qty_max   = sample["Quantity"].quantile(0.95)
+_price_min = sample["UnitPrice"].quantile(0.05)
+_price_max = sample["UnitPrice"].quantile(0.95)
+_ship_max  = sample["ShippingCost"].quantile(0.95)
+_rev_max   = sample["Revenue"].quantile(0.95)
+
+# Clip values to their axis ranges so lines never exit the chart frame
+_qty      = sample["Quantity"].clip(upper=_qty_max)
+_price    = sample["UnitPrice"].clip(lower=_price_min, upper=_price_max)
+_discount = sample["Discount"].clip(0, 1)
+_shipping = sample["ShippingCost"].fillna(0).clip(upper=_ship_max)
+_revenue  = sample["Revenue"].clip(upper=_rev_max)
+
 fig_par = go.Figure(go.Parcoords(
     line=dict(
         color=sample["CatNum"],
@@ -934,24 +773,26 @@ fig_par = go.Figure(go.Parcoords(
         showscale=False,
     ),
     dimensions=[
-        dict(label="Quantity",      values=sample["Quantity"],
-             range=[sample["Quantity"].min(), sample["Quantity"].quantile(0.99)]),
-        dict(label="Unit Price ($)",values=sample["UnitPrice"],
-             range=[sample["UnitPrice"].min(), sample["UnitPrice"].quantile(0.99)]),
-        dict(label="Discount",      values=sample["Discount"],      range=[0, 1]),
-        dict(label="Shipping ($)",  values=sample["ShippingCost"].fillna(0),
-             range=[0, sample["ShippingCost"].quantile(0.99)]),
-        dict(label="Revenue ($)",   values=sample["Revenue"],
-             range=[sample["Revenue"].min(), sample["Revenue"].quantile(0.99)]),
+        dict(label="Quantity",      values=_qty,
+             range=[1, _qty_max]),
+        dict(label="Unit Price ($)",values=_price,
+             range=[_price_min, _price_max]),
+        dict(label="Discount",      values=_discount, range=[0, 1]),
+        dict(label="Shipping ($)",  values=_shipping,
+             range=[0, _ship_max]),
+        dict(label="Revenue ($)",   values=_revenue,
+             range=[0, _rev_max]),
         dict(label="Category",      values=sample["CatNum"],
              tickvals=list(CAT_NUMS.values()),
-             ticktext=list(CAT_NUMS.keys())),
+             ticktext=list(CAT_NUMS.keys()),
+             range=[-0.5, len(CAT_NUMS) - 0.5]),
     ],
     labelfont=dict(color="#f0f6fc", size=12),
     tickfont=dict(color="#f0f6fc",  size=10),
     rangefont=dict(color="#f0f6fc", size=9),
 ))
-fig_par.update_layout(**LAYOUT_BASE, height=420)
+fig_par.update_layout(**LAYOUT_BASE, height=520)
+fig_par.update_layout(margin=dict(l=80, r=80, t=100, b=60))
 st.plotly_chart(fig_par, use_container_width=True)
 
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
