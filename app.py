@@ -642,12 +642,14 @@ with col_dow:
         z=dow_pivot.values,
         x=dow_pivot.columns.tolist(),
         y=dow_pivot.index.tolist(),
-        colorscale=[[0,"#0d1117"],[0.5,"#1d4ed8"],[1,"#93c5fd"]],
+        colorscale=[[0,"#1e3a5f"],[0.5,"#2563eb"],[1,"#93c5fd"]],
         hovertemplate="<b>%{y} · %{x}</b><br>Revenue: $%{z:,.0f}<extra></extra>",
-        text=[[f"${v/1e3:.0f}K" for v in row] for row in dow_pivot.values],
+        text=[[f"${v/1e6:.2f}M" for v in row] for row in dow_pivot.values],
         texttemplate="%{text}",
         textfont=dict(size=10),
-        colorbar=dict(tickfont=dict(color="#f0f6fc")),
+        colorbar=dict(tickfont=dict(color="#f0f6fc"),
+                      tickformat="$.2fM", tickprefix="", ticksuffix="",
+                      title=dict(text="Revenue ($M)", font=dict(color="#f0f6fc"))),
     ))
     fig_dow.update_layout(
         **LAYOUT_BASE, height=400,
@@ -794,6 +796,10 @@ fig_par = go.Figure(go.Parcoords(
 fig_par.update_layout(**LAYOUT_BASE, height=520)
 fig_par.update_layout(margin=dict(l=80, r=80, t=100, b=60))
 st.plotly_chart(fig_par, use_container_width=True)
+st.caption(
+    f"Displaying a random sample of {len(sample):,} of {len(fdf):,} orders "
+    f"(random_state=42 for reproducibility). Full dataset has too many lines for smooth rendering."
+)
 
 st.markdown("<div class='divider'></div>", unsafe_allow_html=True)
 
